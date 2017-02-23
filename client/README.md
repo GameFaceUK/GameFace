@@ -1,6 +1,6 @@
-## angular2-seed
+## GameFace
 
-A simple starter project demonstrating the basic concepts of Angular 2.
+A simple gamification of task
 
 
 ### Usage
