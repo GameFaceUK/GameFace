@@ -2,9 +2,10 @@ import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
+  moduleId: module.id,
   selector: 'home-app',
-  templateUrl: 'app/home/home.component.html',
-  styleUrls: ['app/home/home.component.css']
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
 
@@ -29,7 +30,7 @@ export class HomeComponent implements OnInit {
 
 
   public selectPlayer(value: any) {
-    if (value != 0) {
+    if (value !== 0) {
       this.selectedPlayer = value;
     }
   }
@@ -39,8 +40,8 @@ export class HomeComponent implements OnInit {
   }
 
   public canViewProfile(): boolean {
-    var validPlayer = this.users.find(x => x === this.selectedPlayer);
-    return validPlayer != undefined && validPlayer !== this.defaultPlayer;
+    let validPlayer = this.users.find(x => x === this.selectedPlayer);
+    return validPlayer !== undefined && validPlayer !== this.defaultPlayer;
   }
 
 }

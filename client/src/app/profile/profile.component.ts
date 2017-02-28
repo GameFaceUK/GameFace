@@ -2,7 +2,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Component } from '@angular/core';
 
 @Component({
-    templateUrl: 'app/profile/profile.component.html'
+    moduleId: module.id,
+    templateUrl: './profile.component.html'
 })
 
 export class ProfileComponent{

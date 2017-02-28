@@ -14,7 +14,7 @@ import { ProfileComponent } from './profile/profile.component';
     RouterModule.forRoot(appRoutes)
   ],
   declarations: [
-    AppComponent, 
+    AppComponent,
     HomeComponent,
     ProfileComponent
   ],
