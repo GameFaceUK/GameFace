@@ -1,3 +1,11 @@
 select, option {
     color: black
 }
+
+.dropdown-menu {
+  width: 10%; 
+}
+
+.btn{
+ width: 10%;
+}

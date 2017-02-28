@@ -1,7 +1,8 @@
 export class CommonVO {
 
     public static Pages = {
-        Home: "Home"
+        Home: 'home',
+        Profile: 'profile/:user'
     }
 
 }
