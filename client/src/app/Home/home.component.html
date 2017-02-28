@@ -1,17 +1,12 @@
 <h1>
-Home
+    Home
 </h1>
 
-<select>
+<div>
+    <select class="btn">
 <option disabled hidden value="" > Pick Player </option>
-<option value ="one"> Matt </option>
-<option value ="two"> edgar </option>
-<option value ="three"> marlon </option>
-<option value ="four"> elena </option>
+<option *ngFor="let user of users" value ="{{user}}">{{user}}</option>
 
 </select>
-
-<br/>
-<button>
-Click Me
-</button>
+    <button class="btn btn-primary">Click Me</button>
+</div>
