@@ -10,9 +10,9 @@
 //
 //   To do all steps, try:  `npm run e2e`
 
-var fs = require('fs');
-var path = require('canonical-path');
-var _ = require('lodash');
+var fs = require("fs");
+var path = require("canonical-path");
+var _ = require("lodash");
 
 
 exports.config = {
