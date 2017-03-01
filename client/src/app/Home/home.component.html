@@ -1,17 +1,8 @@
-<h1>
-Home
-</h1>
-
-<select>
-<option disabled hidden value="" > Pick Player </option>
-<option value ="one"> Matt </option>
-<option value ="two"> edgar </option>
-<option value ="three"> marlon </option>
-<option value ="four"> elena </option>
-
-</select>
-
-<br/>
-<button>
-Click Me
-</button>
+<div class="dropdown">
+  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">{{selectedPlayer}}
+  <span class="caret"></span></button>
+  <ul class="dropdown-menu" (click)="selectPlayer($event.target.value)">
+    <li *ngFor="let user of users"><button class="btn btn-default" type="button" value="{{user}}">{{user}}</button></li>
+  </ul>
+  <button [disabled]="!canViewProfile()" class="btn btn-primary" type="button" (click)="viewProfile()">View Profile</button>
+</div>
