@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>682736bb-c225-42f9-b5ea-9aa721b12cda</ProjectGuid>
-    <RootNamespace>GameFace.Api</RootNamespace>
+    <ProjectGuid>1d002a87-a43f-4518-a59e-b566f9cb8b4f</ProjectGuid>
+    <RootNamespace>GameFace</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
