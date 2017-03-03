@@ -15,12 +15,44 @@ namespace GameFace.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752");
 
-            modelBuilder.Entity("GameFace.Modules.CompletingTasks", b =>
+            modelBuilder.Entity("GameFace.Models.Achieve", b =>
+                {
+                    b.Property<int>("idAchieve")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("description");
+
+                    b.Property<int>("idTask");
+
+                    b.Property<int>("levelNeeded");
+
+                    b.HasKey("idAchieve");
+
+                    b.HasIndex("idTask");
+
+                    b.ToTable("Achieve");
+                });
+
+            modelBuilder.Entity("GameFace.Models.Rewards", b =>
+                {
+                    b.Property<int>("idReward")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("description");
+
+                    b.HasKey("idReward");
+
+                    b.ToTable("Rewards");
+                });
+
+            modelBuilder.Entity("GameFace.Models.StatisticDatapoint", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("date");
+                    b.Property<string>("description");
+
+                    b.Property<int>("idStatistic");
 
                     b.Property<int>("idTask");
 
@@ -28,39 +60,53 @@ namespace GameFace.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("idTask");
+                    b.HasIndex("idStatistic");
 
                     b.HasIndex("idUser");
 
-                    b.ToTable("CompletingTasks");
+                    b.ToTable("StatisticDatapoint");
                 });
 
-            modelBuilder.Entity("GameFace.Modules.Tasks", b =>
+            modelBuilder.Entity("GameFace.Models.StatisticType", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("idStatistic")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("description");
 
-                    b.Property<string>("name");
+                    b.HasKey("idStatistic");
 
-                    b.Property<int>("value");
+                    b.ToTable("StatisticType");
+                });
+
+            modelBuilder.Entity("GameFace.Models.Tasks", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("desirability");
+
+                    b.Property<int>("efort");
+
+                    b.Property<int>("frequency");
+
+                    b.Property<string>("name");
 
                     b.HasKey("id");
 
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("GameFace.Modules.Users", b =>
+            modelBuilder.Entity("GameFace.Models.Users", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("active");
-
                     b.Property<string>("name");
 
                     b.Property<string>("nickName");
+
+                    b.Property<bool>("status");
 
                     b.Property<string>("surName");
 
@@ -72,18 +118,122 @@ namespace GameFace.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GameFace.Modules.CompletingTasks", b =>
+            modelBuilder.Entity("GameFace.Models.UsersAchievements", b =>
                 {
-                    b.HasOne("GameFace.Modules.Tasks", "Tasks")
-                        .WithMany("taskComplition")
+                    b.Property<int>("idAchievement");
+
+                    b.Property<int>("idUser");
+
+                    b.Property<DateTime>("date");
+
+                    b.HasKey("idAchievement", "idUser");
+
+                    b.HasIndex("idUser");
+
+                    b.ToTable("UsersAchievements");
+                });
+
+            modelBuilder.Entity("GameFace.Models.UsersRewards", b =>
+                {
+                    b.Property<int>("idReward");
+
+                    b.Property<int>("idUser");
+
+                    b.Property<bool>("hasClaimed");
+
+                    b.HasKey("idReward", "idUser");
+
+                    b.HasIndex("idUser");
+
+                    b.ToTable("UsersRewards");
+                });
+
+            modelBuilder.Entity("GameFace.Models.XP", b =>
+                {
+                    b.Property<int>("idUser");
+
+                    b.Property<int>("idTask");
+
+                    b.Property<int>("Steps");
+
+                    b.HasKey("idUser", "idTask");
+
+                    b.HasIndex("idTask");
+
+                    b.ToTable("XP");
+                });
+
+            modelBuilder.Entity("GameFace.Models.Achieve", b =>
+                {
+                    b.HasOne("GameFace.Models.Tasks", "tasks")
+                        .WithMany("achievement")
                         .HasForeignKey("idTask")
-                        .HasConstraintName("ForeignKey_CompleteT_Tasks")
+                        .HasConstraintName("ForeignKey_Achievem_tasks")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GameFace.Models.StatisticDatapoint", b =>
+                {
+                    b.HasOne("GameFace.Models.Tasks", "tasks")
+                        .WithMany("statisticDatapoint")
+                        .HasForeignKey("idStatistic")
+                        .HasConstraintName("ForeignKey_statisticDP_task")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("GameFace.Modules.Users", "Users")
-                        .WithMany("taskComplition")
+                    b.HasOne("GameFace.Models.StatisticType", "statistics")
+                        .WithMany("statisticDatapoint")
+                        .HasForeignKey("idStatistic")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GameFace.Models.Users", "users")
+                        .WithMany("statisticDatapoint")
                         .HasForeignKey("idUser")
-                        .HasConstraintName("ForeignKey_CompleteT_User")
+                        .HasConstraintName("ForeignKey_statisticDP_user")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GameFace.Models.UsersAchievements", b =>
+                {
+                    b.HasOne("GameFace.Models.Achieve", "achievement")
+                        .WithMany("usersAchievement")
+                        .HasForeignKey("idAchievement")
+                        .HasConstraintName("ForeignKey_userAchiev_achiev")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GameFace.Models.Users", "users")
+                        .WithMany("userAchievements")
+                        .HasForeignKey("idUser")
+                        .HasConstraintName("ForeignKey_userAchievm_user")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GameFace.Models.UsersRewards", b =>
+                {
+                    b.HasOne("GameFace.Models.Rewards", "reward")
+                        .WithMany("userRewards")
+                        .HasForeignKey("idReward")
+                        .HasConstraintName("ForeignKey_userReward_Reward")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GameFace.Models.Users", "users")
+                        .WithMany("userRewards")
+                        .HasForeignKey("idUser")
+                        .HasConstraintName("ForeignKey_userReward_User")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GameFace.Models.XP", b =>
+                {
+                    b.HasOne("GameFace.Models.Tasks", "tasks")
+                        .WithMany("xP")
+                        .HasForeignKey("idTask")
+                        .HasConstraintName("ForeignKey_XPCateg")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GameFace.Models.Users", "User")
+                        .WithMany("xP")
+                        .HasForeignKey("idUser")
+                        .HasConstraintName("ForeignKey_XPUser")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
         }
