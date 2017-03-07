@@ -1,3 +1,9 @@
+# safelist
+branches:
+  only:
+  - master
+  - develop
+
 dist: trusty
 sudo: required
 language: node_js
@@ -18,3 +24,4 @@ script:
   - npm run lint
   - npm run test:once
   - npm run e2e
+
