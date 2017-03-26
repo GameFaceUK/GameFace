@@ -13,8 +13,7 @@ namespace GameFace
     {
 
         public ModuleUsers() : base("user")
-        {
-            
+        {            
             Post("/", async args =>
             {
                 try
