@@ -27,14 +27,14 @@ namespace GameFace.Modules
 
             });
 
-            Get("/{id:int}", async args =>
+            Get("/{name:string}", async args =>
             {
-                int Id = args.id;
+                string  namepar = args.name;
                 using (var database = new GameFaceContext())
                 {
                    // int Id = args.id;
                     List<string> liststring = new List<string>();
-                    var users = database.Users.Include(x => x.userAchievements).Where(x => x.id == Id);
+                    var users = database.Users.Include(x => x.userAchievements).Where(x => x.nickName == namepar);
                     foreach (Users u in users)
                     {
                         foreach (UsersAchievements a in u.userAchievements)
@@ -42,7 +42,7 @@ namespace GameFace.Modules
                             var line = database.Achieve.Where(ac => ac.idAchieve == a.idAchievement).Single();
                             var tasks = database.Tasks.Where(t => t.id == line.idTask).Single();
                             liststring.Add(u.nickName + "; " + u.name + "; " + a.date + "; " + line.levelNeeded + "; " + line.idTask + "; "
-                                + line.description + "; " + tasks.name + "; " + tasks.value + "; " + tasks. + "; ");
+                                + line.description + "; " + tasks.name + "; " + tasks.value + "; " + tasks.id + "; ");
                         }
                     }
 
@@ -67,7 +67,7 @@ namespace GameFace.Modules
                                 var line = database.Achieve.Where(ac => ac.idAchieve== a.idAchievement).Single();
                                 var tasks = database.Tasks.Where(t => t.id == line.idTask).Single();
                                 liststring.Add(u.nickName + "; " + u.name + "; " + a.date + "; "+ line.levelNeeded +"; "+line.idTask + "; "
-                                    +line.description + "; " + tasks.name + "; " + tasks.value + "; " + tasks. + "; ");
+                                    +line.description + "; " + tasks.name + "; " + tasks.value + "; " + tasks.id+ "; ");
                             }
                         }
 
