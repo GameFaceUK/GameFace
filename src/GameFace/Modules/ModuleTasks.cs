@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using GameFace.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace GameFace.Modules
 {
@@ -21,9 +22,16 @@ namespace GameFace.Modules
                 var creationAttempt = this.Bind<Tasks>(c => c.id);
                 using (var database = new GameFaceContext())
                 {
-                    database.Tasks.Add(creationAttempt);
-                    await database.SaveChangesAsync();
-                }
+                    try
+                    {
+                        database.Tasks.Add(creationAttempt);
+                        await database.SaveChangesAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        string msg = e.Message;                        
+                    }
+                    }
             });
 
             Get("/{Id:int}", async args =>

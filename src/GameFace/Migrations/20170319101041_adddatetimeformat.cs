@@ -152,7 +152,7 @@ namespace GameFace.Migrations
                 {
                     idUser = table.Column<int>(nullable: false),
                     idTask = table.Column<int>(nullable: false),
-                    Steps = table.Column<int>(nullable: false)
+                    date = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
