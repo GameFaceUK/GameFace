@@ -93,7 +93,7 @@ namespace GameFace.Controllers
                               
             modelBuilder.Entity<StatisticType>().HasKey(c => c.idStatistic);
 
-            modelBuilder.Entity<XP>().HasKey(c => new { c.idUser, c.idTask });
+            modelBuilder.Entity<XP>().HasKey(c => new { c.idUser, c.idTask ,c.date});
             modelBuilder.Entity<XP>()
             .HasOne(s => s.tasks)
             .WithMany(c => c.xP)

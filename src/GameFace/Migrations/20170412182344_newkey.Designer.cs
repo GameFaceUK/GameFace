@@ -8,9 +8,10 @@ using GameFace.Controllers;
 namespace GameFace.Migrations
 {
     [DbContext(typeof(GameFaceContext))]
-    partial class GameFaceContextModelSnapshot : ModelSnapshot
+    [Migration("20170412182344_newkey")]
+    partial class newkey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752");
