@@ -19,12 +19,18 @@ namespace GameFace.Modules
                 Post("/", async args =>
                 {
                         var creationAttempt = this.Bind<Achieve>(c => c.idAchieve);
-                        using (var database = new GameFaceContext())
-                        {                           
+                    using (var database = new GameFaceContext())
+                    {
+                        try
+                        {
                             database.Achieve.Add(creationAttempt);
                             await database.SaveChangesAsync();
                         }
-                                      
+                        catch (Exception e)
+                        {
+                            string msg = e.Message;                            
+                        }
+                    }
                 });
 
                 Get("/{Id:int}", async args =>

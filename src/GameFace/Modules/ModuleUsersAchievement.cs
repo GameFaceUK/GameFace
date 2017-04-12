@@ -54,14 +54,14 @@ namespace GameFace.Modules
                             var tasks = database.Tasks.Where(t => t.id == xp.idTask).Single();
                             if (xp.date > firstDayOfQuarter)
                             {
-                                userrecords.Add(new UserRecords(tasks.name, xp.date, tasks.value));
+                                userrecords = Helper.AddElement(userrecords, new UserRecords(tasks.name, 1, tasks.value));
                             }
                             value += tasks.value;
                         }
                         nickname = u.nickName;
                     }
 
-                    UserProfile list = new UserProfile(nickname, value, userrecords.OrderByDescending(c => c.Date).ToList());
+                    UserProfile list = new UserProfile(nickname, value, userrecords.ToList());
                     return await Task.FromResult(list);
                 }
             });
@@ -71,7 +71,7 @@ namespace GameFace.Modules
                 int iduser = args.id;
                 using (var database = new GameFaceContext())
                 {
-                    var userrecords = new List<UserRecords>();
+                    var userrecords = new List<UserRecordsDate>();
                     string nickname = "";
                     var liststring = new List<string>();
                     var users = database.Users.Include(x => x.xP).Where(x => x.id == iduser);
@@ -80,7 +80,7 @@ namespace GameFace.Modules
                         foreach (XP xp in u.xP)
                         {
                             var tasks = database.Tasks.Where(t => t.id == xp.idTask).Single();
-                            userrecords.Add(new UserRecords(tasks.name, xp.date, tasks.value));                           
+                            userrecords.Add(new UserRecordsDate(tasks.name, xp.date, tasks.value));                           
                         }
                         nickname = u.nickName;
                     }
