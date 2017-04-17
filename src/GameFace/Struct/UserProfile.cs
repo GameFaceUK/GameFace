@@ -75,11 +75,13 @@ namespace GameFace.Struct
     {
         public string NickName;
         public int Experience;
+        public List<string> Achievements;
         public List<UserRecords> Records;
-        public UserProfile(string nickname, int experience, List<UserRecords> records)
+        public UserProfile(string nickname, int experience, List<string> achievements, List<UserRecords> records)
         {
             NickName = nickname;
             Experience = experience;
+            Achievements = achievements;
             Records = records;
         }
     }

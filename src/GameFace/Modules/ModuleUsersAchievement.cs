@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Nancy.Owin;
 using System;
 using GameFace.Struct;
+using GameFace.Utils;
 
 namespace GameFace.Modules
 {
@@ -24,6 +25,7 @@ namespace GameFace.Modules
                 {
                     try
                     {
+                        UsersExtractions.CheckAvailableAcievementsForXP(creationAttempt.idUser, creationAttempt.idTask);
                         database.XP.Add(creationAttempt);
                         await database.SaveChangesAsync();
                     }
@@ -60,8 +62,8 @@ namespace GameFace.Modules
                         }
                         nickname = u.nickName;
                     }
-
-                    UserProfile list = new UserProfile(nickname, value, userrecords.ToList());
+                    var ach = UsersExtractions.GetUserAchievements(iduser).Select(c => c.description).ToList();
+                    UserProfile list = new UserProfile(nickname, value, ach, userrecords.ToList());
                     return await Task.FromResult(list);
                 }
             });
@@ -89,6 +91,33 @@ namespace GameFace.Modules
                     return await Task.FromResult(list);
                 }
             });
+
+
+            
+
+            Get("/xp/{id:int}/{task:int}", async args =>
+            {
+                int iduser = args.id;
+                int idtask = args.task;
+                using (var database = new GameFaceContext())
+                {
+                    int experience =0;
+                    var users = database.Users.Include(x => x.xP).Where(x => x.id == iduser);
+                    foreach (Users u in users)
+                    {
+                        foreach (XP xp in u.xP)
+                        {
+                            if (xp.idTask == args.task)
+                            {
+                                var tasks = database.Tasks.Where(t => t.id == xp.idTask).Single();
+                                experience += tasks.value;
+                            }                           
+                        }
+                    }
+                    return await Task.FromResult(experience);
+                }
+            });
+
 
 
 
