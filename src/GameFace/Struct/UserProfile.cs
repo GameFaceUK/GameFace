@@ -16,13 +16,11 @@ namespace GameFace.Struct
             {
                 for (var i= 0; i < list.Count; i++)
                 {
-                    if (list[i].Task.Equals(element.Task))
-                    {
-                        var newrecord = new UserRecords(list[i].Task, list[i].NoPerforms + 1, list[i].Value + element.Value);
-                        list.Remove(list[i]);
-                        list.Add(newrecord);
-                        found = true;
-                    }
+                    if (!list[i].Task.Equals(element.Task)) continue;
+                    var newrecord = new UserRecords(list[i].Task, list[i].NoPerforms + 1, list[i].Value + element.Value);
+                    list.Remove(list[i]);
+                    list.Add(newrecord);
+                    found = true;
                 }
                 if (!found)
                 {
@@ -36,10 +34,10 @@ namespace GameFace.Struct
 
         public static List<SprintRecords> DevideBySprints(List<UserRecordsDate> list)
         {
-            DateTime date = list[0].Date;
+            var date = list[0].Date;
             int quarterNumber = (date.Month - 1) / 3 + 1;
-            DateTime firstDayOfQuarter = new DateTime(date.Year, (quarterNumber - 1) * 3 + 1, 1);
-            DateTime lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
+            var firstDayOfQuarter = new DateTime(date.Year, (quarterNumber - 1) * 3 + 1, 1);
+            var lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
 
             var listtemp = new List<UserRecords>();
             var sprint = new List<SprintRecords>();

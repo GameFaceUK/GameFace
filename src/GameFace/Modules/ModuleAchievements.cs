@@ -1,11 +1,6 @@
-﻿using Nancy;
-using Nancy.ModelBinding;
-using GameFace.Controllers;
+﻿using GameFace.Controllers;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using GameFace.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace GameFace.Modules
@@ -15,24 +10,7 @@ namespace GameFace.Modules
 
             public ModuleAchievements() : base("achieve")
             {
-
-                Post("/", async args =>
-                {
-                        var creationAttempt = this.Bind<Achieve>(c => c.idAchieve);
-                    using (var database = new GameFaceContext())
-                    {
-                        try
-                        {
-                            database.Achieve.Add(creationAttempt);
-                            await database.SaveChangesAsync();
-                        }
-                        catch (Exception e)
-                        {
-                            string msg = e.Message;                            
-                        }
-                    }
-                });
-
+            
                 Get("/{Id:int}", async args =>
                 {
                     try

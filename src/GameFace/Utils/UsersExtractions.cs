@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace GameFace.Utils
 {
@@ -17,49 +16,45 @@ namespace GameFace.Utils
             {
                 int experience = 0;
                 var users = database.Users.Include(x => x.xP).Where(x => x.id == user);
-                foreach (Users u in users)
+                foreach (var u in users)
                 {
-                    foreach (XP xp in u.xP)
-                    {
-                        if (xp.idTask == task)
-                        {
-                            var tasks = database.Tasks.Where(t => t.id == xp.idTask).Single();
-                            experience += tasks.value;
-                        }
-                    }
+                    experience += (from xp in u.xP where xp.idTask == task select database.Tasks.Single(t => t.id == xp.idTask) into tasks select tasks.value).Sum();
                 }
                 return experience;
             }
         }
 
-        public static void CheckAvailableAcievementsForXP(int user, int task)
+        public static UsersAchievements CheckAvailableAcievementsForXP(int user, int task)
         {
             var experience = GetExperienceUserByTask(user, task);
             var newexp = experience;
             using (var database = new GameFaceContext())
             {
-               var tasks = database.Tasks.Where(t => t.id == task).Single();
+               var tasks = database.Tasks.Single(t => t.id == task);
                newexp += tasks.value;
-               CheckAvailableAchievements(user, task, experience, newexp).GetAwaiter();
+               return CheckAvailableAchievements(user, task, experience, newexp);
             }          
         }
 
-        public static async Task CheckAvailableAchievements(int user, int task, int currentxp, int newxp)
+        public static UsersAchievements CheckAvailableAchievements(int user, int task, int currentxp, int newxp)
         {
-            var experience = GetExperienceUserByTask(user, task);
             using (var database = new GameFaceContext())
             {
-                var achieve = database.Achieve.Where(a => a.idTask == task 
-                && (((a.levelNeeded > currentxp) && (a.levelNeeded < newxp )) 
-                || (a.levelNeeded == newxp) ||
-                ((currentxp==0) && (a.levelNeeded < newxp)))).Single();
+                var achievements = database.Achieve.Where(a => a.idTask == task ).ToList();
+                var achieve = achievements.FirstOrDefault(b => (b.levelNeeded > currentxp && b.levelNeeded < newxp)
+                                                           || b.levelNeeded == newxp ||
+                                                           (currentxp == 0 && b.levelNeeded > newxp));
+                if (achieve == null)
+                {
+                    return null;
+                }
                 var userachieve = new UsersAchievements
                 {
                     idUser = user,
                     idAchievement = achieve.idAchieve,
                     date = DateTime.Now
                 };
-                InsertingRecords.InsertAchievements(userachieve).GetAwaiter();
+                return userachieve;
             }            
         }
 
@@ -71,14 +66,14 @@ namespace GameFace.Utils
             using (var database = new GameFaceContext())
             {
                 var users = database.Users.Include(x => x.userAchievements).Where(x => x.id == user);
-                foreach (Users u in users)
+                foreach (var u in users)
                 {
-                    foreach (UsersAchievements a in u.userAchievements)
+                    foreach (var a in u.userAchievements)
                     {
-                        var line = database.Achieve.Where(ac => ac.idAchieve == a.idAchievement).Single();
+                        var line = database.Achieve.Single(ac => ac.idAchieve == a.idAchievement);
                         for(var i=0;i<achievements.Count;i++)
                         {
-                            if ((achievements[i].idTask ==line.idTask)&&(achievements[i].levelNeeded< line.levelNeeded))
+                            if (achievements[i].idTask ==line.idTask && achievements[i].levelNeeded< line.levelNeeded)
                             {
                                 achievements.Remove(achievements[i]);
                             }

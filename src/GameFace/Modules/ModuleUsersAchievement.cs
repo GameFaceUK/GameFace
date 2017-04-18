@@ -25,7 +25,11 @@ namespace GameFace.Modules
                 {
                     try
                     {
-                        UsersExtractions.CheckAvailableAcievementsForXP(creationAttempt.idUser, creationAttempt.idTask);
+                        var userachieve = UsersExtractions.CheckAvailableAcievementsForXP(creationAttempt.idUser, creationAttempt.idTask);
+                        if (userachieve!=null)
+                        {
+                            database.UsersAchievements.Add(userachieve);
+                        }
                         database.XP.Add(creationAttempt);
                         await database.SaveChangesAsync();
                     }
@@ -41,19 +45,18 @@ namespace GameFace.Modules
                 int iduser = args.id;
                 using (var database = new GameFaceContext())
                 {
-                    DateTime date = DateTime.Now;
+                    var date = DateTime.Now;
                     int quarterNumber = (date.Month - 1) / 3 + 1;
-                    DateTime firstDayOfQuarter = new DateTime(date.Year, (quarterNumber - 1) * 3 + 1, 1);
+                    var firstDayOfQuarter = new DateTime(date.Year, (quarterNumber - 1) * 3 + 1, 1);
                     var userrecords = new List<UserRecords>();
                     string nickname = "";
                     int value = 0;
-                    var liststring = new List<string>();
                     var users = database.Users.Include(x => x.xP).Where(x => x.id==iduser);
-                    foreach (Users u in users)
+                    foreach (var u in users)
                     {
-                        foreach (XP xp in u.xP)
+                        foreach (var xp in u.xP)
                         {
-                            var tasks = database.Tasks.Where(t => t.id == xp.idTask).Single();
+                            var tasks = database.Tasks.Single(t => t.id == xp.idTask);
                             if (xp.date > firstDayOfQuarter)
                             {
                                 userrecords = Helper.AddElement(userrecords, new UserRecords(tasks.name, 1, tasks.value));
@@ -74,109 +77,37 @@ namespace GameFace.Modules
                 using (var database = new GameFaceContext())
                 {
                     var userrecords = new List<UserRecordsDate>();
-                    string nickname = "";
-                    var liststring = new List<string>();
+                    var nickname = "";
                     var users = database.Users.Include(x => x.xP).Where(x => x.id == iduser);
-                    foreach (Users u in users)
+                    foreach (var u in users)
                     {
-                        foreach (XP xp in u.xP)
-                        {
-                            var tasks = database.Tasks.Where(t => t.id == xp.idTask).Single();
-                            userrecords.Add(new UserRecordsDate(tasks.name, xp.date, tasks.value));                           
-                        }
+                        userrecords.AddRange(from xp in u.xP let tasks = database.Tasks.Single(t => t.id == xp.idTask) select new UserRecordsDate(tasks.name, xp.date, tasks.value));
                         nickname = u.nickName;
                     }
                     userrecords = userrecords.OrderByDescending(c => c.Date).ToList();
-                    UserHistory list = new UserHistory(nickname, userrecords.Select(c => c.Value).Sum(), Helper.DevideBySprints(userrecords));
+                    var list = new UserHistory(nickname, userrecords.Select(c => c.Value).Sum(), Helper.DevideBySprints(userrecords));
                     return await Task.FromResult(list);
                 }
             });
-
-
-            
+          
 
             Get("/xp/{id:int}/{task:int}", async args =>
             {
                 int iduser = args.id;
-                int idtask = args.task;
                 using (var database = new GameFaceContext())
                 {
                     int experience =0;
                     var users = database.Users.Include(x => x.xP).Where(x => x.id == iduser);
-                    foreach (Users u in users)
+                    foreach (var u in users)
                     {
-                        foreach (XP xp in u.xP)
-                        {
-                            if (xp.idTask == args.task)
-                            {
-                                var tasks = database.Tasks.Where(t => t.id == xp.idTask).Single();
-                                experience += tasks.value;
-                            }                           
-                        }
+                        experience += (from xp in u.xP where xp.idTask == args.task select database.Tasks.Single(t => t.id == xp.idTask) into tasks select tasks.value).Sum();
                     }
                     return await Task.FromResult(experience);
                 }
             });
 
-
-
-
-
-            Get("/{name:string}", async args =>
-            {
-                string  namepar = args.name;
-                using (var database = new GameFaceContext())
-                {
-                   // int Id = args.id;
-                    List<string> liststring = new List<string>();
-                    var users = database.Users.Include(x => x.xP).Where(x => x.nickName == namepar);
-                    foreach (Users u in users)
-                    {
-                        foreach (XP a in u.xP)
-                        {
-                            var tasks = database.Tasks.Where(t => t.id == a.idTask).Single();
-                            liststring.Add(u.nickName + "; " + u.name + "; " + a.date + "; " +"; " 
-                                + tasks.name + "; " + tasks.value + "; " );
-                        }
-                    }
-
-                    return await Task.FromResult(liststring);
-                }
-            });
             
-          
-            Get("/", async args =>
-            {
-                try
-                {
-                    using (var database = new GameFaceContext())
-                    {
-                       
-                        List<string> liststring = new List<string>();
-                        var users = database.Users.Include(x => x.userAchievements);
-                        foreach (Users u in users)
-                        {
-                            foreach (UsersAchievements a in u.userAchievements)
-                            {
-                                var line = database.Achieve.Where(ac => ac.idAchieve== a.idAchievement).Single();
-                                var tasks = database.Tasks.Where(t => t.id == line.idTask).Single();
-                                liststring.Add(u.nickName + "; " + u.name + "; " + a.date + "; "+ line.levelNeeded +"; "+line.idTask + "; "
-                                    +line.description + "; " + tasks.name + "; " + tasks.value + "; " + tasks.id+ "; ");
-                            }
-                        }
-
-                        return await Task.FromResult(liststring);
-                    }
-                }
-                catch (Exception e)
-                {
-                    string msg = e.Message;
-                    return msg;
-                }
-
-            });
-
-
+           
          
         }
     }
