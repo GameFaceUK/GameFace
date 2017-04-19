@@ -65,7 +65,8 @@ namespace GameFace.Modules
                         }
                         nickname = u.nickName;
                     }
-                    var ach = UsersExtractions.GetUserAchievements(iduser).Select(c => c.description).ToList();
+                    var listach = UsersExtractions.GetUserAchievements(iduser);
+                    var ach = listach.Select(elem => new UserAchieve(elem.description, elem.idTask)).ToList();
                     UserProfile list = new UserProfile(nickname, value, ach, userrecords.ToList());
                     return await Task.FromResult(list);
                 }

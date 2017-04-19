@@ -73,9 +73,9 @@ namespace GameFace.Struct
     {
         public string NickName;
         public int Experience;
-        public List<string> Achievements;
+        public List<UserAchieve> Achievements;
         public List<UserRecords> Records;
-        public UserProfile(string nickname, int experience, List<string> achievements, List<UserRecords> records)
+        public UserProfile(string nickname, int experience, List<UserAchieve> achievements, List<UserRecords> records)
         {
             NickName = nickname;
             Experience = experience;
@@ -131,6 +131,18 @@ namespace GameFace.Struct
             Task = task;
             NoPerforms = noPerforms;
             Value = value;
+        }
+    }
+
+    public struct UserAchieve
+    {
+        public string Achieve { get; set; }
+        public int IdTask { get; set; }
+      
+        public UserAchieve(string achieve, int idTask)
+        {
+            Achieve = achieve;
+            IdTask = idTask;
         }
     }
 }
