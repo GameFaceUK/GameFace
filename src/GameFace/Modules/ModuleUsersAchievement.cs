@@ -1,12 +1,10 @@
-﻿using Nancy;
-using Nancy.ModelBinding;
+﻿using Nancy.ModelBinding;
 using GameFace.Controllers;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using GameFace.Models;
 using Microsoft.EntityFrameworkCore;
-using Nancy.Owin;
 using System;
 using GameFace.Struct;
 using GameFace.Utils;
@@ -45,9 +43,7 @@ namespace GameFace.Modules
                 int iduser = args.id;
                 using (var database = new GameFaceContext())
                 {
-                    var date = DateTime.Now;
-                    int quarterNumber = (date.Month - 1) / 3 + 1;
-                    var firstDayOfQuarter = new DateTime(date.Year, (quarterNumber - 1) * 3 + 1, 1);
+                    var firstDayOfQuarter = (DateTime.Now).FirstDayOfQuarter();
                     var userrecords = new List<UserRecords>();
                     string nickname = "";
                     int value = 0;
@@ -57,7 +53,7 @@ namespace GameFace.Modules
                         foreach (var xp in u.xP)
                         {
                             var tasks = database.Tasks.Single(t => t.id == xp.idTask);
-                            if (xp.date > firstDayOfQuarter)
+                            if (xp.date >= firstDayOfQuarter)
                             {
                                 userrecords = Helper.AddElement(userrecords, new UserRecords(tasks.name, 1, tasks.value));
                             }
@@ -82,11 +78,11 @@ namespace GameFace.Modules
                     var users = database.Users.Include(x => x.xP).Where(x => x.id == iduser);
                     foreach (var u in users)
                     {
-                        userrecords.AddRange(from xp in u.xP let tasks = database.Tasks.Single(t => t.id == xp.idTask) select new UserRecordsDate(tasks.name, xp.date, tasks.value));
+                        userrecords.AddRange(from xp in u.xP let tasks = database.Tasks.Single(t => t.id == xp.idTask)
+                                             select new UserRecordsDate(tasks.name, xp.date, tasks.value));
                         nickname = u.nickName;
                     }
-                    userrecords = userrecords.OrderByDescending(c => c.Date).ToList();
-                    var list = new UserHistory(nickname, userrecords.Select(c => c.Value).Sum(), Helper.DevideBySprints(userrecords));
+                    var list = new UserHistory(nickname, userrecords.Select(c => c.Value).Sum(), Helper.DevideInSprints(userrecords));
                     return await Task.FromResult(list);
                 }
             });

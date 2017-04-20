@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using GameFace.Utils;
 
 namespace GameFace.Struct
 {
@@ -7,66 +9,48 @@ namespace GameFace.Struct
     {
         public static List<UserRecords> AddElement(List<UserRecords> list, UserRecords element)
         {
-            var found = false;
-            if (list.Count == 0)
+            for (var i= 0; i < list.Count; i++)
             {
-                list.Add(element);
+                if (!list[i].Task.Equals(element.Task)) continue;
+                var newrecord = new UserRecords(list[i].Task, list[i].NoPerforms + 1, list[i].Value + element.Value);
+                list.Remove(list[i]);
+                list.Add(newrecord);
+                return  list;
             }
-            else
-            {
-                for (var i= 0; i < list.Count; i++)
-                {
-                    if (!list[i].Task.Equals(element.Task)) continue;
-                    var newrecord = new UserRecords(list[i].Task, list[i].NoPerforms + 1, list[i].Value + element.Value);
-                    list.Remove(list[i]);
-                    list.Add(newrecord);
-                    found = true;
-                }
-                if (!found)
-                {
-                    list.Add(element);
-                }
-            }
-            
+
+            list.Add(element);
+
             return list;
         }
 
 
-        public static List<SprintRecords> DevideBySprints(List<UserRecordsDate> list)
+        public static List<SprintRecords> DevideInSprints(List<UserRecordsDate> list)
         {
-            var date = list[0].Date;
-            int quarterNumber = (date.Month - 1) / 3 + 1;
-            var firstDayOfQuarter = new DateTime(date.Year, (quarterNumber - 1) * 3 + 1, 1);
-            var lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
+            list = list.OrderByDescending(c => c.Date).ToList();
 
-            var listtemp = new List<UserRecords>();
-            var sprint = new List<SprintRecords>();
-            foreach (var record in list)
-            {
-                if (firstDayOfQuarter < record.Date && record.Date < lastDayOfQuarter)
+            var dividedSprints = list
+                .GroupBy(
+                    record => new { First = record.Date.FirstDayOfQuarter(), Last = record.Date.LastDayOfQuarter() },
+                    record => record)
+                .Select(group =>
                 {
-                    listtemp = AddElement(listtemp, new UserRecords(record.Task,1,record.Value));
-                }
-                else
-                {
-                    sprint.Add(new SprintRecords(firstDayOfQuarter, lastDayOfQuarter, listtemp));
-                    listtemp = new List<UserRecords> { new UserRecords(record.Task, 1, record.Value) };
-                    date = record.Date;
-                    quarterNumber = (date.Month - 1) / 3 + 1;
-                    firstDayOfQuarter = new DateTime(date.Year, (quarterNumber - 1) * 3 + 1, 1);
-                    lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
-                }
-            }
-            if (listtemp.Count > 0)
-            {
-                sprint.Add(new SprintRecords(firstDayOfQuarter, lastDayOfQuarter, listtemp));
-            }
-            return sprint;
+                    var listOfUserRecords = new List<UserRecords>();
+                    listOfUserRecords = group
+                        .Select(record => new UserRecords(record.Task, 1, record.Value))
+                        .Aggregate(listOfUserRecords, AddElement);
+
+                    return new SprintRecords(group.Key.First, group.Key.Last, listOfUserRecords);
+                })
+                .ToList();
+            
+            return dividedSprints;
         }
+
+        
     }
 
 
-
+   
 
 
     public struct UserProfile
